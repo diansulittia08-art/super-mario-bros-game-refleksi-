@@ -1,0 +1,202 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mario's Reflection Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#0b1030}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden}
+*{box-sizing:border-box}
+#wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:960px;height:540px;flex:none;font-family:'Trebuchet MS',system-ui,sans-serif;color:#fff;user-select:none;touch-action:none;overflow:hidden}
+#c{position:absolute;left:0;top:0;width:960px;height:540px;image-rendering:pixelated}
+.scr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px}
+.scr.on{display:flex}
+.px{font-family:'Press Start 2P',monospace}
+h1{font:34px/1.3 'Press Start 2P',monospace;margin:0;color:#ffd21a;text-shadow:4px 4px #c1121f,0 0 12px #000}
+h2{font:16px 'Press Start 2P',monospace;margin:0;text-shadow:2px 2px #000}
+.id{font-size:20px;font-weight:bold;text-shadow:2px 2px #000;background:#0008;padding:6px 16px;border-radius:8px}
+.b{font:15px 'Press Start 2P',monospace;padding:14px 20px;border:0;border-bottom:6px solid #8a1c00;background:#ff5a1f;color:#fff;cursor:pointer;border-radius:8px;text-shadow:2px 2px #000;min-width:340px}
+.b:hover{background:#ff7a3f}.b:active{transform:translateY(3px);border-bottom-width:3px}
+.b.g{background:#22a34a;border-color:#0d6b2b}.b.s{min-width:0;font-size:12px;padding:10px 14px}
+.box{background:#1b2a6b;border:4px solid #fff;border-radius:12px;padding:16px 24px;width:840px;max-height:500px;overflow:auto;text-align:left;font-size:19px;line-height:1.4;box-shadow:0 8px 0 #0006}
+.box h3{margin:0 0 8px;color:#ffd21a;font:15px 'Press Start 2P',monospace}
+table{border-collapse:collapse;width:100%;font-size:18px}td,th{border:2px solid #fff6;padding:4px 8px}th{background:#0004}
+#lv{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:900px}
+.card{width:170px;background:#1b2a6b;border:4px solid #ffd21a;border-radius:10px;padding:10px 6px;cursor:pointer;font-size:15px;box-shadow:0 5px 0 #0006}
+.card:hover{background:#2c40a0;transform:translateY(-3px)}.card b{font:12px 'Press Start 2P';color:#ffd21a;display:block;margin-bottom:6px}
+#hud{display:none;pointer-events:none}#hud.on{display:block}#hud>*{pointer-events:auto;position:absolute}
+.t{bottom:16px;width:110px;height:90px;font-size:38px;border-radius:14px;border:4px solid #fff;background:#0007;color:#fff;cursor:pointer}
+#quiz .box{display:flex;gap:20px;width:880px;align-items:flex-start}#gc{background:#fff;border-radius:6px;flex:none}
+#opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+#opts .b{min-width:0;font-size:16px;background:#3b5bdb;border-color:#1c3aa9}
+.ok{background:#22a34a!important;border-color:#0d6b2b!important}.no{background:#d62828!important;border-color:#7a0f0f!important}
+</style></head><body>
+<div id="wrap"><div id="stage">
+<canvas id="c" width="960" height="540"></canvas>
+
+<div class="scr on" id="title">
+ <h1>MARIO'S<br>REFLECTION ADVENTURE</h1>
+ <h2>Petualangan Refleksi Geometri</h2>
+ <div class="id">Matematika Kelas IX SMP<br>Dian Agustin Sulittia, S.Pd.</div>
+ <button class="b" onclick="lvMenu()">▶ MULAI PETUALANGAN</button>
+ <button class="b g" onclick="show('help')">PETUNJUK PERMAINAN</button>
+ <button class="b g" onclick="show('mat')">MATERI REFLEKSI</button>
+ <button class="b g" onclick="tog()" id="snd">PENGATURAN SUARA: ON</button>
+</div>
+
+<div class="scr" id="levels">
+ <h1 style="font-size:26px">PILIH LEVEL</h1>
+ <div id="lv"></div>
+ <button class="b s" onclick="show('title')">◀ KEMBALI</button>
+</div>
+
+<div class="scr" id="help"><div class="box"><h3>PETUNJUK PERMAINAN</h3>
+ <p>🎮 <b>Gerak:</b> tombol ← → (atau A / D). <b>Lompat:</b> ↑ / W / Spasi. Di layar sentuh, pakai tombol di bawah layar.<br>
+ ❓ <b>Blok ?</b>: lompat dan sentuh blok untuk mendapat soal refleksi. Jawab benar = +100 poin.<br>
+ 🪙 Kumpulkan koin (+10). 👾 Injak musuh dari atas (+50), jangan tertabrak dari samping.<br>
+ ♥ Kamu punya 3 nyawa. Jatuh ke jurang atau tertabrak musuh mengurangi nyawa.<br>
+ 🏁 Jawab <b>semua blok ?</b> lalu capai bendera untuk menyelesaikan level dan raih bintang ⭐.</p>
+ <button class="b s" onclick="show('title')">TUTUP</button></div></div>
+
+<div class="scr" id="mat"><div class="box"><h3>MATERI REFLEKSI (PENCERMINAN)</h3>
+ <p><b>Refleksi</b> adalah transformasi yang memindahkan setiap titik dengan sifat seperti bayangan pada cermin.
+ Jarak titik ke cermin = jarak bayangan ke cermin; bentuk dan ukuran tidak berubah, tetapi orientasinya terbalik.</p>
+ <table><tr><th>Cermin</th><th>A(x, y) menjadi A′</th></tr>
+ <tr><td>Sumbu-X (y = 0)</td><td>(x, −y)</td></tr><tr><td>Sumbu-Y (x = 0)</td><td>(−x, y)</td></tr>
+ <tr><td>Titik asal O(0, 0)</td><td>(−x, −y)</td></tr><tr><td>Garis y = x</td><td>(y, x)</td></tr>
+ <tr><td>Garis y = −x</td><td>(−y, −x)</td></tr><tr><td>Garis x = k</td><td>(2k − x, y)</td></tr>
+ <tr><td>Garis y = k</td><td>(x, 2k − y)</td></tr></table><br>
+ <button class="b s" onclick="show('title')">TUTUP</button></div></div>
+
+<div class="scr" id="quiz"><div class="box"><canvas id="gc" width="260" height="260"></canvas>
+ <div><h3 id="qh"></h3><div id="qt" style="font-size:22px;font-weight:bold"></div><div id="opts"></div>
+ <div id="fb" style="font-size:18px;min-height:52px"></div><button class="b s" id="qn" style="display:none" onclick="qClose()">LANJUT ▶</button></div></div></div>
+
+<div class="scr" id="res"><div class="box" style="text-align:center;width:640px"><h1 id="rt" style="font-size:24px"></h1><p id="rb" style="font-size:22px"></p>
+ <div id="rbtn" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"></div></div></div>
+
+<div id="hud">
+ <button class="b s" style="right:60px;top:6px" onclick="tog()" id="snd2">🔊</button>
+ <button class="b s" style="right:8px;top:6px" onclick="lvMenu()">☰</button>
+ <button class="t" style="left:16px" id="bl">◀</button><button class="t" style="left:140px" id="br">▶</button>
+ <button class="t" style="right:16px;width:150px;font-size:16px" id="bj">LOMPAT</button>
+</div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id),K={l:0,r:0,j:0},R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+let S={mode:'menu',t:0},prog={},sound=true,AC;
+try{prog=JSON.parse(localStorage.getItem('mra')||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem('mra',JSON.stringify(prog))}catch(e){}};
+function show(id){document.querySelectorAll('.scr').forEach(e=>e.classList.toggle('on',e.id==id));if(id!='hud')document.getElementById('hud').classList.remove('on')}
+function fit(){const s=Math.min(innerWidth/960,innerHeight/540);$('stage').style.transform='scale('+s+')'}
+addEventListener('resize',fit);fit();
+// ---------- suara ----------
+function beep(f,d,t='square',v=.07,s=0){if(!sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),a=AC.createGain(),n=AC.currentTime+s;o.type=t;o.frequency.setValueAtTime(f,n);a.gain.setValueAtTime(v,n);a.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(a);a.connect(AC.destination);o.start(n);o.stop(n+d)}catch(e){}}
+const SFX={jump:()=>{beep(300,.12);beep(520,.12,'square',.07,.06)},coin:()=>{beep(988,.08);beep(1319,.25,'square',.07,.08)},
+ok:()=>[523,659,784,1047].forEach((f,i)=>beep(f,.15,'square',.07,i*.1)),bad:()=>{beep(200,.25,'sawtooth');beep(140,.3,'sawtooth',.07,.2)},
+win:()=>[523,523,523,659,784,1047].forEach((f,i)=>beep(f,.18,'square',.07,i*.13)),stomp:()=>beep(150,.1)};
+function tog(){sound=!sound;$('snd').textContent='PENGATURAN SUARA: '+(sound?'ON':'OFF');$('snd2').textContent=sound?'🔊':'🔇';if(sound)SFX.coin()}
+// ---------- soal refleksi ----------
+const TY={
+X:{n:()=>'sumbu-X',f:(x,y)=>[x,-y],ln:()=>[-8,0,8,0],e:()=>'Sumbu-X: (x, y) → (x, −y). Absis tetap, ordinat berubah tanda.'},
+Y:{n:()=>'sumbu-Y',f:(x,y)=>[-x,y],ln:()=>[0,-8,0,8],e:()=>'Sumbu-Y: (x, y) → (−x, y). Ordinat tetap, absis berubah tanda.'},
+O:{n:()=>'titik asal O(0, 0)',f:(x,y)=>[-x,-y],ln:()=>null,e:()=>'Titik asal: (x, y) → (−x, −y). Absis dan ordinat sama-sama berubah tanda.'},
+D:{n:()=>'garis y = x',f:(x,y)=>[y,x],ln:()=>[-8,-8,8,8],e:()=>'Garis y = x: (x, y) → (y, x). Absis dan ordinat bertukar.'},
+M:{n:()=>'garis y = −x',f:(x,y)=>[-y,-x],ln:()=>[-8,8,8,-8],e:()=>'Garis y = −x: (x, y) → (−y, −x). Bertukar dan berubah tanda.'},
+V:{n:k=>`garis x = ${k}`,f:(x,y,k)=>[2*k-x,y],ln:k=>[k,-8,k,8],e:k=>`Garis x = k: (x, y) → (2k − x, y), dengan k = ${k}.`},
+H:{n:k=>`garis y = ${k}`,f:(x,y,k)=>[x,2*k-y],ln:k=>[-8,k,8,k],e:k=>`Garis y = k: (x, y) → (x, 2k − y), dengan k = ${k}.`}};
+const POOL={1:['X','Y'],2:['X','Y','O'],3:['V','H'],4:['D','M'],5:['X','Y','O','D','M','V','H']};
+const LN=['Hutan Sumbu-X','Bukit Sumbu-Y','Pulau Garis x=k, y=k','Gunung Diagonal','Kastil Raja Cermin'];
+const LT=['Refleksi terhadap sumbu-X dan sumbu-Y','Sumbu-X, sumbu-Y, dan titik asal','Garis x = k dan y = k','Garis y = x dan y = −x','Semua jenis refleksi'];
+function mkQ(lv){const p=POOL[lv],ty=p[R(0,p.length-1)],T=TY[ty],k=R(1,3);let x,y,a;
+ do{x=R(-5,5);y=R(-5,5);a=T.f(x,y,k)}while(!x||!y||(a[0]==x&&a[1]==y)||Math.abs(a[0])>8||Math.abs(a[1])>8);
+ const s=q=>q.join(','),bad=[[x,y],[x,-y],[-x,y],[-x,-y],[y,x],[-y,-x],[2*k+x,y],[x,2*k+y],[2*k-x,-y]].filter(q=>s(q)!=s(a)&&Math.abs(q[0])<=9&&Math.abs(q[1])<=9);
+ const o=[a],seen=new Set([s(a)]);bad.sort(()=>Math.random()-.5).forEach(q=>{if(o.length<4&&!seen.has(s(q))){seen.add(s(q));o.push(q)}});
+ o.sort(()=>Math.random()-.5);return{T,k,x,y,a,o,txt:`Titik A(${x}, ${y}) direfleksikan terhadap ${T.n(k)}. Tentukan koordinat bayangan A′!`}}
+function gd(q,ans){const c=$('gc').getContext('2d'),u=15,o=130,X=v=>o+v*u,Y=v=>o-v*u;
+ c.fillStyle='#fff';c.fillRect(0,0,260,260);c.strokeStyle='#d0d8e8';c.lineWidth=1;
+ for(let i=-8;i<=8;i++){c.beginPath();c.moveTo(X(i),0);c.lineTo(X(i),260);c.moveTo(0,Y(i));c.lineTo(260,Y(i));c.stroke()}
+ c.strokeStyle='#222';c.lineWidth=2;c.beginPath();c.moveTo(0,o);c.lineTo(260,o);c.moveTo(o,0);c.lineTo(o,260);c.stroke();
+ const l=q.T.ln(q.k);if(l){c.strokeStyle='#e5a800';c.lineWidth=3;c.setLineDash([8,5]);c.beginPath();c.moveTo(X(l[0]),Y(l[1]));c.lineTo(X(l[2]),Y(l[3]));c.stroke();c.setLineDash([])}
+ const dot=(p,col,t)=>{c.fillStyle=col;c.beginPath();c.arc(X(p[0]),Y(p[1]),6,0,7);c.fill();c.font='bold 16px sans-serif';c.fillText(t,X(p[0])+8,Y(p[1])-8)};
+ if(!l)dot([0,0],'#e5a800','O');dot([q.x,q.y],'#e52521','A');if(ans)dot(q.a,'#12a150','A′')}
+let Q=null;
+function openQ(b){S.pause=1;Q={b,d:mkQ(S.lv)};show('quiz');$('qh').textContent=`SOAL ${S.qs.filter(z=>z.done).length+1} / ${S.qs.length}`;$('qt').textContent=Q.d.txt;
+ $('fb').textContent='';$('qn').style.display='none';gd(Q.d,0);const box=$('opts');box.innerHTML='';
+ Q.d.o.forEach(p=>{const e=document.createElement('button');e.className='b';e.textContent=`(${p[0]}, ${p[1]})`;e.onclick=()=>ans(e,p);box.appendChild(e)})}
+function ans(e,p){const d=Q.d,r=p.join()==d.a.join();[...$('opts').children].forEach(x=>{x.disabled=true;if(x.textContent==`(${d.a[0]}, ${d.a[1]})`)x.classList.add('ok')});
+ if(r){SFX.ok();S.score+=100;S.corr++;$('fb').innerHTML='✅ <b>Benar!</b> '+d.T.e(d.k)}else{e.classList.add('no');SFX.bad();$('fb').innerHTML=`❌ Belum tepat. Jawaban: A′(${d.a[0]}, ${d.a[1]}). `+d.T.e(d.k)}
+ gd(d,1);$('qn').style.display='inline-block'}
+function qClose(){Q.b.done=1;show('none');$('hud').classList.add('on');S.pause=0}
+// ---------- level ----------
+function lvMenu(){S.mode='menu';show('levels');const l=$('lv');l.innerHTML='';
+ for(let i=1;i<=5;i++){const c=document.createElement('div');c.className='card';const s=prog[i]||0;
+  c.innerHTML=`<b>LEVEL ${i}</b>${LN[i-1]}<br><small>${LT[i-1]}</small><br><span style="font-size:22px">${'⭐'.repeat(s)}${'☆'.repeat(3-s)}</span>`;c.onclick=()=>start(i);l.appendChild(c)}}
+function build(lv){const q=lv==5?5:3,L0=2800+lv*400,gy=460,sol=[],co=[],en=[],qs=[],segs=[];let x=0;
+ while(x<L0-560){const w=R(380,480);segs.push([x,w]);x+=w+R(90,130)}segs.push([x,560]);
+ const n=segs.length,idx=[];for(let j=0;j<q;j++)idx.push(1+Math.floor(j*(n-2)/q));
+ segs.forEach(([sx,w],i)=>{sol.push({x:sx,y:gy,w,h:80,g:1});
+  for(let c=0;c<5;c++)co.push({x:sx+60+c*(w-120)/4,y:gy-40});
+  if(idx.includes(i))qs.push({x:sx+w/2-20,y:gy-135,w:40,h:40,done:0});
+  else if(i>0&&i<n-1){const px=sx+w/2-60;sol.push({x:px,y:gy-115,w:120,h:22});for(let c=0;c<4;c++)co.push({x:px+15+c*30,y:gy-150})}
+  if(i>0&&i<n-1)en.push({x:sx+w*.6,y:gy-28,w:30,h:28,d:-1,x0:sx+20,x1:sx+w-50,alive:1})});
+ const ls=segs[n-1];return{sol,co,en,qs,L:ls[0]+ls[1],fx:ls[0]+ls[1]-140}}
+function start(lv){const b=build(lv);S={mode:'play',t:S.t,lv,...b,p:{x:60,y:390,w:28,h:40,vx:0,vy:0,on:0,f:1,inv:0},cam:0,hp:3,score:0,coins:0,corr:0,pause:0,msg:'',mt:0,cp:60};show('none');$('hud').classList.add('on')}
+const hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+function hurt(){const p=S.p;if(p.inv)return;S.hp--;p.inv=90;SFX.bad();p.vy=-8;if(S.hp<=0)end(0)}
+function end(w){S.mode='end';const q=S.qs.length,st=S.corr==q?3:S.corr>=q*.6?2:1;show('res');const btn=$('rbtn');btn.innerHTML='';
+ const add=(t,f,c)=>{const e=document.createElement('button');e.className='b s '+(c||'');e.textContent=t;e.onclick=f;btn.appendChild(e)};
+ if(w){SFX.win();prog[S.lv]=Math.max(prog[S.lv]||0,st);save();$('rt').textContent='LEVEL SELESAI!';
+  $('rb').innerHTML=`${'⭐'.repeat(st)}${'☆'.repeat(3-st)}<br>Jawaban benar: ${S.corr}/${q}<br>Skor: ${S.score}`;if(S.lv<5)add('LEVEL BERIKUTNYA ▶',()=>start(S.lv+1),'g')}
+ else{$('rt').textContent='GAME OVER';$('rb').innerHTML=`Jawaban benar: ${S.corr}/${q}<br>Skor: ${S.score}<br>Ayo coba lagi!`}
+ const l=S.lv;add('ULANGI',()=>start(l));add('PETA LEVEL',lvMenu)}
+function step(){const p=S.p,ax=(K.l?-1:0)+(K.r?1:0);p.vx=ax*4.2;if(ax)p.f=ax;
+ if(K.j&&p.on){p.vy=-13.8;p.on=0;SFX.jump()}p.vy=Math.min(p.vy+.62,15);
+ p.x+=p.vx;for(const s of S.sol)if(hit(p,s)){if(p.vx>0)p.x=s.x-p.w;else if(p.vx<0)p.x=s.x+s.w}
+ p.x=Math.max(0,p.x);p.y+=p.vy;p.on=0;
+ for(const s of S.sol)if(hit(p,s)){if(p.vy>0){p.y=s.y-p.h;p.on=1;if(s.g)S.cp=s.x+40}else p.y=s.y+s.h;p.vy=0}
+ if(p.inv)p.inv--;
+ if(p.y>620){S.hp--;SFX.bad();if(S.hp<=0)return end(0);p.x=S.cp;p.y=390;p.vy=0;p.inv=90}
+ S.co=S.co.filter(c=>{if(Math.abs(c.x-(p.x+14))<24&&Math.abs(c.y-(p.y+20))<30){S.coins++;S.score+=10;SFX.coin();return false}return true});
+ S.en.forEach(e=>{if(!e.alive)return;e.x+=e.d*1.2;if(e.x<e.x0||e.x>e.x1)e.d*=-1;
+  if(hit(p,e)){if(p.vy>0&&p.y+p.h-p.vy<=e.y+14){e.alive=0;p.vy=-9;S.score+=50;SFX.stomp()}else hurt()}});
+ for(const b of S.qs)if(!b.done&&hit(p,b)){b.done=1;b.done=0;S.p.vy=Math.max(p.vy,2);openQ(b);return}
+ if(hit(p,{x:S.fx,y:240,w:24,h:220})){if(S.qs.every(b=>b.done))end(1);else{S.msg='Jawab semua blok ? dulu!';S.mt=120}}
+ if(S.mt)S.mt--;S.cam=Math.max(0,Math.min(S.L-600,p.x-320))}
+// ---------- gambar ----------
+const g=$('c').getContext('2d'),SKY=g.createLinearGradient(0,0,0,540);SKY.addColorStop(0,'#3fa9ff');SKY.addColorStop(1,'#bfe9ff');
+const r=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+function ground(s,cam){const xs=Math.max(s.x,cam-40),xe=Math.min(s.x+s.w,cam+1000),w=xe-xs;r('#8b4a1b',xs,s.y,w,s.h);r('#4ed14e',xs,s.y,w,12);r('#2e9e2e',xs,s.y+12,w,4);
+ for(let x=Math.ceil(xs/32)*32;x<xe;x+=32)r('#6b3410',x,s.y+16,2,64);for(let y=s.y+36;y<s.y+80;y+=20)r('#6b3410',xs,y,w,2)}
+function brick(s){r('#c8541e',s.x,s.y,s.w,s.h);r('#ffb37a',s.x,s.y,s.w,4);for(let x=s.x+24;x<s.x+s.w;x+=24)r('#7a2e0a',x,s.y+4,2,s.h-4);r('#7a2e0a',s.x,s.y+s.h/2+2,s.w,2)}
+function hero(x,y,f,walk,inv){if(inv&&S.t%8<4)return;g.save();g.translate(x+14,y);g.scale(f,1);g.translate(-14,0);
+ r('#e52521',4,0,20,8);r('#e52521',14,6,14,4);r('#f7c58f',6,10,18,12);r('#5a3216',6,10,6,8);r('#5a3216',16,18,10,3);r('#000',17,12,3,5);
+ r('#e52521',4,22,20,8);r('#2a5bd7',6,26,16,10);r('#ffd21a',9,28,3,3);r('#2a5bd7',6,36,6,2);r('#2a5bd7',16,36,6,2);
+ r('#5a3216',walk?2:4,38,10,4);r('#5a3216',walk?16:14,38,10,4);g.restore()}
+function draw(){const m=S.mode!='play'&&S.mode!='end',cam=m?S.t*.7:S.cam;g.fillStyle=SKY;g.fillRect(0,0,960,540);
+ g.fillStyle='#fff3a0';g.beginPath();g.arc(820,90,40,0,7);g.fill();
+ for(let i=0;i<6;i++){const cx=((i*260-cam*.2)%1560+1560)%1560-150,cy=60+(i%3)*40;g.fillStyle='#fff';[[0,0,26],[28,-8,32],[58,0,24]].forEach(([a,b,rr])=>{g.beginPath();g.arc(cx+a,cy+b,rr,0,7);g.fill()})}
+ [['#7ad57a',400,.3,120,150],['#4fbf5f',300,.5,90,120]].forEach(([c,sp,f,h,rx])=>{for(let i=-1;i<5;i++){const hx=i*sp-(cam*f)%sp;g.fillStyle=c;g.beginPath();g.ellipse(hx+sp/2,470,rx,h,0,Math.PI,0);g.fill()}});
+ g.save();g.translate(-Math.floor(cam),0);
+ if(m){ground({x:cam-40,y:460,w:1100,h:80},cam);hero(cam+150,420,1,S.t%20<10,0)}
+ else{S.sol.forEach(s=>{if(s.x+s.w>cam&&s.x<cam+960)s.g?ground(s,cam):brick(s)});
+  S.co.forEach(c=>{const w=Math.abs(Math.cos(S.t/12))*10+3;g.fillStyle='#ffd21a';g.beginPath();g.ellipse(c.x,c.y,w,10,0,0,7);g.fill();g.strokeStyle='#b57a00';g.lineWidth=2;g.stroke()});
+  S.qs.forEach(b=>{const oy=b.done?0:Math.sin(S.t/15)*3;r(b.done?'#8a5a2b':'#b57a00',b.x-2,b.y+oy-2,b.w+4,b.h+4);r(b.done?'#a8743d':'#ffc21a',b.x,b.y+oy,b.w,b.h);
+   if(!b.done){g.fillStyle='#fff';g.font='bold 30px sans-serif';g.textAlign='center';g.fillText('?',b.x+20,b.y+oy+32)}});
+  S.en.forEach(e=>{if(!e.alive)return;r('#a0522d',e.x+2,e.y,26,16);r('#a0522d',e.x+6,e.y-4,18,4);r('#f5deb3',e.x+4,e.y+16,22,8);r('#fff',e.x+6,e.y+4,7,7);r('#fff',e.x+17,e.y+4,7,7);r('#000',e.x+9,e.y+6,3,4);r('#000',e.x+18,e.y+6,3,4);r('#3b1f0a',e.x+(S.t%20<10?0:6),e.y+24,12,4)});
+  r('#ddd',S.fx,240,6,220);g.fillStyle='#ffd21a';g.beginPath();g.arc(S.fx+3,238,8,0,7);g.fill();g.fillStyle='#22c55e';g.beginPath();g.moveTo(S.fx+6,248);g.lineTo(S.fx+56+Math.sin(S.t/8)*4,275);g.lineTo(S.fx+6,300);g.fill();
+  r('#8b4a1b',S.fx-6,452,18,8);const p=S.p;hero(p.x,p.y,p.f,p.on&&p.vx&&S.t%16<8,p.inv)}
+ g.restore();
+ if(!m){r('#0009',0,0,960,44);g.font='16px "Press Start 2P",monospace';g.textAlign='left';g.fillStyle='#ff4d4d';g.fillText('♥'.repeat(Math.max(S.hp,0)),14,29);
+  g.fillStyle='#fff';g.fillText('SKOR '+S.score,130,29);g.fillStyle='#ffd21a';g.fillText('● '+S.coins,370,29);g.fillStyle='#fff';g.fillText('? '+S.qs.filter(b=>b.done).length+'/'+S.qs.length,480,29);g.fillText('LV '+S.lv,600,29);
+  if(S.mt){g.textAlign='center';g.fillStyle='#000a';g.fillRect(240,70,480,44);g.fillStyle='#ffd21a';g.fillText(S.msg,480,99)}}}
+let last=0,acc=0;
+function loop(t){requestAnimationFrame(loop);acc+=Math.min(t-last,100);last=t;while(acc>=16.67){acc-=16.67;if(S.mode=='play'&&!S.pause)step();S.t++}draw()}
+requestAnimationFrame(loop);
+// ---------- kontrol ----------
+const KM={ArrowLeft:'l',a:'l',A:'l',ArrowRight:'r',d:'r',D:'r',ArrowUp:'j',w:'j',W:'j',' ':'j'};
+addEventListener('keydown',e=>{const k=KM[e.key];if(k&&S.mode=='play'){K[k]=1;e.preventDefault()}});
+addEventListener('keyup',e=>{const k=KM[e.key];if(k)K[k]=0});
+[['bl','l'],['br','r'],['bj','j']].forEach(([id,k])=>{const e=$(id);e.onpointerdown=ev=>{K[k]=1;ev.preventDefault()};['pointerup','pointerleave','pointercancel'].forEach(t=>e.addEventListener(t,()=>K[k]=0))});
+</script></body></html>
